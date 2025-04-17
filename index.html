@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cloud Pharmacy System</title>
+  <style>
+    body { font-family: Arial; margin: 20px; background: #f0f0f0; }
+    input, button { padding: 8px; margin: 5px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    th { background-color: #333; color: white; }
+  </style>
+</head>
+<body>
+  <h2>Pharmacy Management System (Cloud)</h2>
+  <input type="text" id="name" placeholder="Medicine Name">
+  <input type="text" id="price" placeholder="Price">
+  <input type="text" id="quantity" placeholder="Quantity">
+  <button onclick="addMedicine()">Add Medicine</button>
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Price</th><th>Quantity</th></tr>
+    </thead>
+    <tbody id="medicineTable"></tbody>
+  </table>
+
+  <script>
+    async function loadMedicines() {
+      const res = await fetch('http://localhost:5000/medicines');
+      const data = await res.json();
+      const table = document.getElementById('medicineTable');
+      table.innerHTML = '';
+      data.forEach(med => {
+        table.innerHTML += `<tr><td>${med.name}</td><td>${med.price}</td><td>${med.quantity}</td></tr>`;
+      });
+    }
+
+    async function addMedicine() {
+      const name = document.getElementById('name').value;
+      const price = document.getElementById('price').value;
+      const quantity = document.getElementById('quantity').value;
+      if (!name || !price || !quantity) return alert("Please fill all fields.");
+      await fetch('http://localhost:5000/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, price, quantity })
+      });
+      document.getElementById('name').value = '';
+      document.getElementById('price').value = '';
+      document.getElementById('quantity').value = '';
+      loadMedicines();
+    }
+
+    loadMedicines();
+  </script>
+</body>
+</html>
